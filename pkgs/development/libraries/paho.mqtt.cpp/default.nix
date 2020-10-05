@@ -1,12 +1,15 @@
-with import <nixpkgs> {};
-
+{ pkgs ? import <nixpkgs>{} }:
 let
-  pahoC = import ../paho.mqtt.c/default.nix;
-
+  localpkgs = import ../default.nix {};
 in
 
-stdenv.mkDerivation rec {
-  name = "paho.mqtt.cpp";
+with pkgs;
+stdenv.mkDerivation {
+
+  name = "paho-mqtt-cpp";
+  nativeBuildInputs = with pkgs; [ cmake ninja pkgconfig ];
+  buildInputs = [ pkgs.openssl localpkgs.paho-mqtt-c ];
+
 
   src = fetchFromGitHub {
     owner = "eclipse";
@@ -15,29 +18,27 @@ stdenv.mkDerivation rec {
     sha256 = "0qbwkfb8lvhkk3vfzggkg0jaahp7rqmhg10cy5jjaradgg0fmyly";
   };
 
-  makeFlags = [
-    "LDCONFIG=echo"
-    "PREFIX=$(out)"
-    "LIBDIR=$(out)/lib"
-    "INCLUDEDIR=$(out)/include"
-    "DESTDIR=$(out)"
-  ];
-
-  installFlags = [
-    "LDCONFIG=echo"
-  ];
-
-  preInstall = ''
-  echo $out
-  mkdir -p $out/usr/local/share/man/man1
-  mkdir -p $out/usr/local/lib
+  configurePhase = ''
+  pwd
+  ls -alh
+  if [ -d "build" ]; then rm -rf "build"; fi
+  mkdir build
+  cd build
   '';
 
-  nativeBuildInputs = with pkgs; [ cmake ninja ];
-  buildInputs = with pkgs;  [ openssl pahoC ];
-  meta = {
+  buildPhase = ''
+  pwd
+  ls -alh
+  echo $CMAKE_INCLUDE_PATH
+  cmake -GNinja -DCMAKE_INSTALL_PREFIX=$out -DPAHO_BUILD_SHARED=TRUE -DPAHO_BUILD_STATIC=FALSE -DPAHO_WITH_SSL=TRUE ..
+
+  ninja
+  '';
+
+
+   meta = {
     homepage = "https://eclipse.org/paho";
-    description = "An Eclipse Paho C client library for MQTT for Windows, Linux and MacOS.";
+    description = "An Eclipse Paho C++ client library for MQTT for Windows, Linux and MacOS.";
     license = stdenv.lib.licenses.epl20;
     maintainers = with stdenv.lib.maintainers; [ ];
     platforms = stdenv.lib.platforms.unix;
