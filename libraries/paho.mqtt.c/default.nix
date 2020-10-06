@@ -16,26 +16,15 @@ stdenv.mkDerivation {
   # cd source/build
 
   configurePhase = ''
-  pwd
-  ls -alh
-  if [ -d "build" ]; then rm -rf "build"; fi
-  mkdir build
-  cd build
+  cmake -GNinja -DCMAKE_INSTALL_PREFIX=$out -DPAHO_BUILD_SHARED=TRUE -DPAHO_BUILD_STATIC=FALSE -DPAHO_WITH_SSL=TRUE .
   '';
 
   buildPhase = ''
-  pwd
-  ls -alh
-  cmake -GNinja -DCMAKE_INSTALL_PREFIX=$out -DPAHO_BUILD_SHARED=TRUE -DPAHO_BUILD_STATIC=FALSE -DPAHO_WITH_SSL=TRUE ..
-
   ninja
   '';
  
 
   installPhase = ''
-  mkdir -p $out/usr/local/share/man/man1
-  mkdir -p $out/usr/local/lib
-  mkdir -p $out/usr/local/include
   CMAKE_INSTALL_PREFIX=$out ninja install 
   '';
 

@@ -1,6 +1,6 @@
 { pkgs ? import <nixpkgs>{} }:
 let
-  localpkgs = import ../default.nix {};
+  localpkgs = import ../../default.nix {};
 in
 
 with pkgs;
@@ -19,19 +19,10 @@ stdenv.mkDerivation {
   };
 
   configurePhase = ''
-  pwd
-  ls -alh
-  if [ -d "build" ]; then rm -rf "build"; fi
-  mkdir build
-  cd build
+  cmake -GNinja -DCMAKE_INSTALL_PREFIX=$out -DPAHO_BUILD_SHARED=TRUE -DPAHO_BUILD_STATIC=FALSE -DPAHO_WITH_SSL=TRUE .
   '';
 
   buildPhase = ''
-  pwd
-  ls -alh
-  echo $CMAKE_INCLUDE_PATH
-  cmake -GNinja -DCMAKE_INSTALL_PREFIX=$out -DPAHO_BUILD_SHARED=TRUE -DPAHO_BUILD_STATIC=FALSE -DPAHO_WITH_SSL=TRUE ..
-
   ninja
   '';
 
