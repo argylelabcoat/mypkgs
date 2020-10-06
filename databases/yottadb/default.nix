@@ -1,4 +1,5 @@
 { pkgs ? import <nixpkgs>{} }:
+
 with pkgs;
 stdenv.mkDerivation {
   name = "yottadb";
@@ -9,12 +10,15 @@ stdenv.mkDerivation {
   };
 
   configurePhase = ''
+  export LD_LIBRARY_PATH=${icu}/lib:${openssl}/lib:${zlib}/lib
   if [ -d "build" ]; then rm -rf "build"; fi
   mkdir build
   cd build
-  cmake -GNinja -DCMAKE_INSTALL_PREFIX=$out  ..
+  cmake -GNinja -DCMAKE_INSTALL_PREFIX=$out   ..
   '';
 
+  # export LD_LIBRARY_PATH=
+  
   buildPhase = ''
   ulimit -n 4096
   ninja
