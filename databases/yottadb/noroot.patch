@@ -1,0 +1,50 @@
+diff -ruN YDB-r1.30/sr_unix/configure.gtc YDB-r1.30.patched/sr_unix/configure.gtc
+--- YDB-r1.30/sr_unix/configure.gtc	2020-08-11 17:36:35.000000000 -0500
++++ YDB-r1.30.patched/sr_unix/configure.gtc	2020-10-12 17:01:37.405393594 -0500
+@@ -25,10 +25,10 @@
+ # depending on the list of locales configured, locale -a might be considered a binary output.
+ # grep needs -a option to process the output as text but -a is not supported on the non-linux servers we have.
+ if [ $arch = "linux" ]; then
+-	echo="/bin/echo -e"
+-	binaryopt="-a"
++	echo="echo"
++	binaryopt=""
+ else
+-	echo=/bin/echo
++	echo="echo"
+ 	binaryopt=""
+ fi
+ 
+@@ -68,7 +68,7 @@
+ 	if [ "$isarm_ydb" -eq 1 ] ; then
+ 		ldcmd="cc" # On Linux/ARM only cc (not ld) creates a valid ELF header when compiling M routines
+ 	else
+-		ldcmd="ld" # Linux - all platforms
++		ldcmd="ld.gold" # Linux - all platforms
+ 	fi
+ else echo "Shared libary ldflags not set for this platform"; exit 1
+ fi
+@@ -104,10 +104,6 @@
+ 
+ ydb_id=`command -v id`
+ euid=`$ydb_id -un`	# Get effective user id
+-if [ "$euid" != "root" ] ; then
+-	$echo "You must run Configure as root."
+-	exit 1
+-fi
+ 
+ $echo "                     YottaDB Configuration Script"
+ $echo "Copyright 2009, 2014 Fidelity Information Services, Inc. Use of this"
+diff -ruN YDB-r1.30/sr_unix/ydbinstall.sh YDB-r1.30.patched/sr_unix/ydbinstall.sh
+--- YDB-r1.30/sr_unix/ydbinstall.sh	2020-08-11 17:36:35.000000000 -0500
++++ YDB-r1.30.patched/sr_unix/ydbinstall.sh	2020-10-12 16:17:37.487517071 -0500
+@@ -683,9 +683,6 @@
+     fi
+  else
+     echo Non-root installations not currently supported
+-    if [ "N" = "$gtm_dryrun" ] ; then err_exit
+-    else echo "Continuing because --dry-run selected"
+-    fi
+ fi
+ if [ -z "$ydb_installdir" ] ; then
+     if [ "N" = "$gtm_gtm" ] ; then
