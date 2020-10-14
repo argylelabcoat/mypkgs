@@ -32,7 +32,7 @@ stdenv.mkDerivation {
     ./ydbinstall --installdir=$out/bin --force-install --user nixbld --group nixbld
   '';
 
-  nativeBuildInputs = [ cmake ninja pkgconfig icu tcsh git wget curl ps file ];
+  nativeBuildInputs = [ cmake pkgconfig icu tcsh git wget curl ps file ];
   buildInputs =
     [ openssl icu gpgme ncurses zlib libconfig libelf libgpgerror libgcrypt ];
 
