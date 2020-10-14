@@ -17,16 +17,15 @@ stdenv.mkDerivation {
   patches = [ ./noroot.patch ];
 
   preConfigure = ''
-  export LD_LIBRARY_PATH=${icu}/lib:${openssl}/lib:${zlib}/lib
-  ulimit -n 4096
+    export LD_LIBRARY_PATH=${icu}/lib:${openssl}/lib:${zlib}/lib
+    ulimit -n 4096
   '';
 
   cmakeFlags = [
-      "-DCMAKE_INSTALL_PREFIX:PATH=/tmp"
-      "-DYDB_INSTALL_DIR:STRING=yottadb-release"
-      "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+    "-DCMAKE_INSTALL_PREFIX:PATH=/tmp"
+    "-DYDB_INSTALL_DIR:STRING=yottadb-release"
+    "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
   ];
-
 
   postFixup = ''
     cd /tmp/yottadb-release/
