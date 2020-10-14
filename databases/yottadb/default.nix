@@ -2,8 +2,8 @@
 let
   version = "r1.30";
   CMAKE_BUILD_TYPE = "Release";
-  routines_dir = "/var/lib/yottadb/${version}/routines";
-  globals_dir = "/var/lib/yottadb/g/";
+  routines_dir = "/var/lib/yottadb/${version}/r";
+  globals_dir = "/var/lib/yottadb/${version}/g";
 in with pkgs;
 stdenv.mkDerivation {
   name = "yottadb";
@@ -16,27 +16,21 @@ stdenv.mkDerivation {
 
   patches = [ ./noroot.patch ];
 
-  configurePhase = ''
-    export LD_LIBRARY_PATH=${icu}/lib:${openssl}/lib:${zlib}/lib
-    if [ -d "build" ]; then rm -rf "build"; fi
-    mkdir build
-    cd build
-    cmake -D CMAKE_INSTALL_PREFIX:PATH=/tmp -D YDB_INSTALL_DIR:STRING=yottadb-release -D CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -G Ninja  ..
+  preConfigure = ''
+  export LD_LIBRARY_PATH=${icu}/lib:${openssl}/lib:${zlib}/lib
+  ulimit -n 4096
   '';
 
-  # export LD_LIBRARY_PATH=
+  cmakeFlags = [
+      "-DCMAKE_INSTALL_PREFIX:PATH=/tmp"
+      "-DYDB_INSTALL_DIR:STRING=yottadb-release"
+      "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+  ];
 
-  buildPhase = ''
-    ulimit -n 4096
-    ninja
-  '';
 
-  installPhase = ''
-    export ydb_keep_obj=Y
-    ninja install
+  postFixup = ''
     cd /tmp/yottadb-release/
     ./ydbinstall --installdir=$out/bin --force-install --user nixbld --group nixbld
-
   '';
 
   nativeBuildInputs = [ cmake ninja pkgconfig icu tcsh git wget curl ps file ];
