@@ -36,6 +36,7 @@ installPhase = ''
     chmod +x $out/bin/func
     chmod +x $out/bin/gozip
     find $out/bin -type f -name "*.so" -exec patchelf --set-rpath "${rpath}" {} \;
+    wrapProgram "$out/bin/func" --prefix LD_LIBRARY_PATH : ${rpath}
   '';
   dontStrip = true;
 
