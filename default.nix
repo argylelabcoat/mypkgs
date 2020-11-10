@@ -7,4 +7,5 @@ in rec {
     pkgs.callPackage ./libraries/paho.mqtt.cpp/default.nix { inherit pkgs; };
   yottadb = pkgs.callPackage ./databases/yottadb/default.nix { inherit pkgs; };
   brlcad = pkgs.callPackage ./applications/brlcad.nix { inherit pkgs; };
+  azure-functions-core-tools = pkgs.callPackage ./tools/admin/azure-functions-core-tools/default.nix { inherit pkgs; };
 }

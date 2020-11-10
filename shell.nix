@@ -5,13 +5,14 @@ in pkgs.mkShell {
   #    mypkgs.paho-mqtt-cpp ]
   buildInputs = [
     # apps
-    # mypkgs.brlcad
+#    mypkgs.brlcad
     # db
     mypkgs.yottadb
     # mqtt
     mypkgs.paho-mqtt-c
-
     mypkgs.paho-mqtt-cpp
+    # azure functions
+    mypkgs.azure-functions-core-tools
   ];
   shellHook = ''
     export ydb_dist=${mypkgs.yottadb}/bin
